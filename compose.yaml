@@ -21,6 +21,7 @@ services:
       - POSTGRES_PASS=${DATABASE_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
       - APP_PORT=${APP_PORT}
+      - JWT_SECRET=${JWT_SECRET}
     ports:
       - '3000:3000' # expose-to-the-world : only-in-the-docker
     container_name: poc-nestjs-app

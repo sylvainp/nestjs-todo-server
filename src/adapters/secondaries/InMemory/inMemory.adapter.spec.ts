@@ -1,4 +1,3 @@
-import { exec } from 'child_process';
 import TodoEntity from '../../../domain/entities/todo.entity';
 import RemoveTodoUsecaseRequest from '../../../domain/usecases/removeTodo/removeTodo.usecaserequest';
 import InMemoryAdapter from './inMemory.adapter';
