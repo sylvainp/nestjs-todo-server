@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import e from 'express';
 import { Repository } from 'typeorm';
-import TodoEntity from '../../../../domain/entities/todo.entity';
-import { TodosPort } from '../../../../domain/ports/todos.port';
-import AddTodoUsecaseRequest from '../../../../domain/usecases/addTodo/addTodo.usecaserequest';
-import RemoveTodoUsecaseRequest from '../../../../domain/usecases/removeTodo/removeTodo.usecaserequest';
-import TodoDBEntity from '../entities/todo.typeorm.entity';
+import TodoEntity from '../../../../../domain/entities/todo.entity';
+import { TodosPort } from '../../../../../domain/ports/todos.port';
+import AddTodoUsecaseRequest from '../../../../../domain/usecases/addTodo/addTodo.usecaserequest';
+import RemoveTodoUsecaseRequest from '../../../../../domain/usecases/removeTodo/removeTodo.usecaserequest';
+import TodoDBEntity from '../../entities/todo.typeorm.entity';
 
 @Injectable()
 export default class TodoRepositoryAdapter implements TodosPort {

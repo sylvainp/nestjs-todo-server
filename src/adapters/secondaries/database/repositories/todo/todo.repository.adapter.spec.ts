@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import TodoEntity from '../../../../domain/entities/todo.entity';
-import TodoDBEntity from '../entities/todo.typeorm.entity';
+import TodoEntity from '../../../../../domain/entities/todo.entity';
+import TodoDBEntity from '../../entities/todo.typeorm.entity';
 import TodoRepositoryAdapter from './todo.repository.adapter';
 import TodoRepositoryMock from './todo.repository.mock';
 

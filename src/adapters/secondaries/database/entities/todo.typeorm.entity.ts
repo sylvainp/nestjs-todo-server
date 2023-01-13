@@ -6,7 +6,4 @@ export default class TodoDBEntity {
   id: string;
   @Column({ nullable: false })
   title: string;
-
-  @Column({ default: false })
-  isDone: boolean;
 }
