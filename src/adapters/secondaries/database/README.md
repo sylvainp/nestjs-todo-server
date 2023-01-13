@@ -9,6 +9,8 @@ Executing the command `docker ps` for getting `poc_nestjs_api-nestjs` container 
 
 Example :
 
-'docker exec c4b9e0726f4c npm run typeorm:generate src/adapters/secondaries/database/migrations/AddUserEntity'
+``` 
+docker exec c4b9e0726f4c npm run typeorm:generate src/adapters/secondaries/database/migrations/AddUserEntity
+```
 
 3. You can now run `docker exec <CONTAINER_ID> npm run typeorm:run` for executing migration
