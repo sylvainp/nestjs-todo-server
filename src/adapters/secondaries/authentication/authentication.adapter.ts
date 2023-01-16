@@ -3,6 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import UserEntity from '../../../domain/entities/user.entity';
 import { AuthPort } from '../../../domain/ports/auth.port';
 import {
+  EncryptionPort,
+  EncryptionPortInjectorName,
+} from '../../../domain/ports/encrypt.port';
+import {
   UsersPort,
   UsersPortInjectorName,
 } from '../../../domain/ports/users.port';
@@ -13,6 +17,8 @@ import { RegisterUsecaseRequest } from '../../../domain/usecases/register/regist
 export default class AuthenticationAdapter implements AuthPort {
   constructor(
     @Inject(UsersPortInjectorName) private readonly userAdaper: UsersPort,
+    @Inject(EncryptionPortInjectorName)
+    private readonly encryptAdapter: EncryptionPort,
     private jwtService: JwtService,
   ) {}
   async validateUser(request: {
@@ -23,9 +29,10 @@ export default class AuthenticationAdapter implements AuthPort {
       const response: UserEntity | Error = await this.userAdaper.getUser({
         email: request.username,
       });
+
       if (
         response instanceof UserEntity &&
-        response.password === request.password
+        (await this.encryptAdapter.compare(request.password, response.password))
       ) {
         return response;
       }
@@ -44,9 +51,13 @@ export default class AuthenticationAdapter implements AuthPort {
     return { access_token: jwt };
   }
   async register(request: RegisterUsecaseRequest): Promise<string | Error> {
-    const response: UserEntity | Error = await this.userAdaper.createUser(
-      request,
-    );
+    const hashPassword = await this.encryptAdapter.hash(request.password);
+    const response: UserEntity | Error = await this.userAdaper.createUser({
+      email: request.email,
+      familyName: request.familyName,
+      givenName: request.givenName,
+      password: hashPassword,
+    });
     if (response instanceof Error) {
       return response;
     }
