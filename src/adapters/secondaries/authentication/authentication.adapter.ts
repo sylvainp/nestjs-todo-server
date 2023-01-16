@@ -19,7 +19,6 @@ export default class AuthenticationAdapter implements AuthPort {
     username: string;
     password: string;
   }): Promise<UserEntity | Error> {
-    console.debug('AuthenticationAdapter.validateUser', { request });
     try {
       const response: UserEntity | Error = await this.userAdaper.getUser({
         email: request.username,
@@ -38,11 +37,6 @@ export default class AuthenticationAdapter implements AuthPort {
   async login(
     request: LoginUsecaseRequest,
   ): Promise<{ access_token: string } | Error> {
-    console.debug(
-      'AuthenticationAdapter.login',
-      `request=${JSON.stringify(request)}`,
-    );
-
     const jwt = this.jwtService.sign({
       username: request.user.email,
       sub: request.user.id,

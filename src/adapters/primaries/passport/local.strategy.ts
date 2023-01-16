@@ -16,7 +16,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(username: string, password: string): Promise<any> {
-    console.debug('LocalStrategy.validate', { username, password });
     const user: UserEntity | Error = await this.authPort.validateUser({
       username,
       password,

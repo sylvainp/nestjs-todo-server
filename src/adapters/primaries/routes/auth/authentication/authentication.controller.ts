@@ -31,7 +31,6 @@ export class AuthenticationController {
     // pour les routes "todos" qui devront être soumise à authentification, il y aura un nouveau guard "jwt"
     const response: UsecaseResponse<{ access_token: string }> =
       await this.loginUsecase.call({ user: req.user });
-    console.error({ response });
     if (response.error) {
       return new UnauthorizedException();
     }
