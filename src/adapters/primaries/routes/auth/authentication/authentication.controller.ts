@@ -47,6 +47,4 @@ export class AuthenticationController {
     }
     return response.data;
   }
-
-  // https://docs.nestjs.com/security/authentication
 }
