@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import TodoEntity from '../../../../../domain/entities/todo.entity';
 import { TodosPort } from '../../../../../domain/ports/todos.port';
 import AddTodoUsecaseRequest from '../../../../../domain/usecases/addTodo/addTodo.usecaserequest';
+import { MarkTodoDoneUsecaseRequest } from '../../../../../domain/usecases/markTodoDone/marlTodoDone.usecaserequest';
 import RemoveTodoUsecaseRequest from '../../../../../domain/usecases/removeTodo/removeTodo.usecaserequest';
 import TodoDBEntity from '../../entities/todo.typeorm.entity';
 
@@ -34,10 +35,32 @@ export default class TodoRepositoryAdapter implements TodosPort {
   }
   async getAllTodos(): Promise<TodoEntity[] | Error> {
     try {
-      const response: TodoDBEntity[] = await this.todoRepository.find();
-      return response.map((item) => new TodoEntity(item.id, item.title));
+      const response: TodoDBEntity[] = await this.todoRepository.find({
+        order: { title: 'ASC' },
+      });
+      return response.map(
+        (item) => new TodoEntity(item.id, item.title, item.done),
+      );
     } catch (error) {
       return Promise.resolve(error);
+    }
+  }
+
+  async markTodoDone(
+    request: MarkTodoDoneUsecaseRequest,
+  ): Promise<TodoEntity | Error> {
+    try {
+      await this.todoRepository.update(request.todoId, { done: request.done });
+      const todoDbEntity: TodoDBEntity = await this.todoRepository.findOneBy({
+        id: request.todoId,
+      });
+      return new TodoEntity(
+        todoDbEntity.id,
+        todoDbEntity.title,
+        todoDbEntity.done,
+      );
+    } catch (error) {
+      return new Error('Unable to update todo');
     }
   }
 }

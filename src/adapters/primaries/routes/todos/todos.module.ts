@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import TodoDBEntity from '../../../secondaries/database/entities/todo.typeorm.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from '../../passport/jwt.strategy';
+import { MarkTodoDoneUsecase } from '../../../../domain/usecases/markTodoDone/markTodoDone.usecase';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JwtStrategy } from '../../passport/jwt.strategy';
     AddTodoUsecase,
     GetAllTodosUsecase,
     RemoveTodoUsecase,
+    MarkTodoDoneUsecase,
     { provide: TodosPortInjectorName, useClass: TodoRepositoryAdapter },
   ],
   controllers: [TodosController],

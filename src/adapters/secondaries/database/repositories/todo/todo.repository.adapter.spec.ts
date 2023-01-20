@@ -1,7 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import TodoEntity from '../../../../../domain/entities/todo.entity';
+import { MarkTodoDoneUsecaseRequest } from '../../../../../domain/usecases/markTodoDone/marlTodoDone.usecaserequest';
 import TodoDBEntity from '../../entities/todo.typeorm.entity';
 import TodoRepositoryAdapter from './todo.repository.adapter';
 import TodoRepositoryMock from './todo.repository.mock';
@@ -27,13 +28,79 @@ describe('TodoRepositoryAdapter', () => {
     expect(todoRepositoryAdapter).toBeDefined();
   });
 
-  const createMockTodoDBEntity = (id = '1', title = 'todo 1'): TodoDBEntity => {
+  const createMockTodoDBEntity = (
+    id = '1',
+    title = 'todo 1',
+    done = false,
+  ): TodoDBEntity => {
     const todoDBEntity = new TodoDBEntity();
     todoDBEntity.id = id;
     todoDBEntity.title = title;
+    todoDBEntity.done = done;
     return todoDBEntity;
   };
 
+  describe('markTodoDone function', () => {
+    const mockRequest: MarkTodoDoneUsecaseRequest = { todoId: '1', done: true };
+    const mockRepoResult: UpdateResult = {
+      affected: 1,
+      raw: {},
+      generatedMaps: [],
+    };
+    const expectedResultEntity = createMockTodoDBEntity(
+      mockRequest.todoId,
+      'todo 1',
+      mockRequest.done,
+    );
+
+    it('must call respository for updating existing record', async () => {
+      expect.assertions(2);
+      jest.spyOn(todoRepository, 'update').mockResolvedValue(mockRepoResult);
+      jest
+        .spyOn(todoRepository, 'findOneBy')
+        .mockResolvedValue(expectedResultEntity);
+      await todoRepositoryAdapter.markTodoDone(mockRequest);
+      expect(todoRepository.update).toHaveBeenCalledTimes(1);
+      expect(todoRepository.update).toHaveBeenCalledWith(mockRequest.todoId, {
+        done: mockRequest.done,
+      });
+    });
+
+    it('must return udpated todo entity', async () => {
+      expect.assertions(3);
+
+      jest.spyOn(todoRepository, 'update').mockResolvedValue(mockRepoResult);
+      jest
+        .spyOn(todoRepository, 'findOneBy')
+        .mockResolvedValue(expectedResultEntity);
+      const result: TodoEntity | Error =
+        await todoRepositoryAdapter.markTodoDone(mockRequest);
+
+      expect(todoRepository.update).toHaveBeenCalledWith(mockRequest.todoId, {
+        done: mockRequest.done,
+      });
+      expect(todoRepository.findOneBy).toHaveBeenCalledWith({
+        id: mockRequest.todoId,
+      });
+      expect(result).toStrictEqual(
+        new TodoEntity(
+          expectedResultEntity.id,
+          expectedResultEntity.title,
+          expectedResultEntity.done,
+        ),
+      );
+    });
+
+    it('must return an error if todoRepo cannot update todoDBEntity', async () => {
+      expect.assertions(1);
+      jest
+        .spyOn(todoRepository, 'update')
+        .mockRejectedValue(new Error('No todo found with id'));
+      await expect(
+        todoRepositoryAdapter.markTodoDone(mockRequest),
+      ).resolves.toStrictEqual(new Error('Unable to update todo'));
+    });
+  });
   describe('addTodo function', () => {
     it('must call repository for adding new record', async () => {
       expect.assertions(3);
@@ -123,11 +190,14 @@ describe('TodoRepositoryAdapter', () => {
 
   describe('getAllTodos function', () => {
     it('must call repository for returning all todos', async () => {
-      expect.assertions(1);
+      expect.assertions(2);
 
       jest.spyOn(todoRepository, 'find').mockResolvedValue([]);
       await todoRepositoryAdapter.getAllTodos();
       expect(todoRepository.find).toHaveBeenCalledTimes(1);
+      expect(todoRepository.find).toHaveBeenCalledWith({
+        order: { title: 'ASC' },
+      });
     });
 
     it('must return todoEntity array build from repository response', async () => {

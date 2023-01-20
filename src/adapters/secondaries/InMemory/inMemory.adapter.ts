@@ -5,6 +5,7 @@ import { TodosPort } from '../../../domain/ports/todos.port';
 import TodoEntity from '../../../domain/entities/todo.entity';
 import AddTodoUsecaseRequest from '../../../domain/usecases/addTodo/addTodo.usecaserequest';
 import RemoveTodoUsecaseRequest from '../../../domain/usecases/removeTodo/removeTodo.usecaserequest';
+import { MarkTodoDoneUsecaseRequest } from '../../../domain/usecases/markTodoDone/marlTodoDone.usecaserequest';
 
 @Injectable()
 export default class InMemoryAdapter implements TodosPort {
@@ -37,5 +38,11 @@ export default class InMemoryAdapter implements TodosPort {
       return null;
     }
     return new TodoEntity(model.id, model.text);
+  }
+
+  markTodoDone(
+    request: MarkTodoDoneUsecaseRequest,
+  ): Promise<TodoEntity | Error> {
+    throw new Error('Not implemented yet');
   }
 }
